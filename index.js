@@ -1,7 +1,6 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { createRequire } from 'module';
 import pairRouter from './pair.js';
 import qrRouter from './qr.js';
 
@@ -14,9 +13,11 @@ import('events').then(e => { e.EventEmitter.defaultMaxListeners = 500; });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 app.use('/code', pairRouter);
 app.use('/qr', qrRouter);
 app.use('/pair', (req, res) => res.sendFile(path.join(__dirname, 'pair.html')));
+app.use('/qr-page', (req, res) => res.sendFile(path.join(__dirname, 'qr-page.html')));
 app.use('/', (req, res) => res.sendFile(path.join(__dirname, 'home.html')));
 
 app.listen(PORT, () => console.log(`🚀 BLACK-MD Session Generator on port ${PORT}`));
