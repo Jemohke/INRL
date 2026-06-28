@@ -28,141 +28,62 @@
     .logo { font-size: 36px; margin-bottom: 6px; }
     h1 { font-size: 22px; color: #25D366; margin-bottom: 4px; }
     .subtitle { color: #666; font-size: 13px; margin-bottom: 24px; }
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
     .tab {
-      flex: 1;
-      padding: 10px;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      color: #888;
-      transition: all 0.2s;
+      flex: 1; padding: 10px; background: #1a1a1a;
+      border: 1px solid #333; border-radius: 8px;
+      cursor: pointer; font-size: 13px; color: #888; transition: all 0.2s;
     }
-    .tab.active {
-      border-color: #25D366;
-      color: #25D366;
-      background: #0d1f14;
-    }
+    .tab.active { border-color: #25D366; color: #25D366; background: #0d1f14; }
     .section { display: none; }
     .section.active { display: block; }
     input {
-      width: 100%;
-      padding: 14px 16px;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 10px;
-      color: #fff;
-      font-size: 15px;
-      margin-bottom: 14px;
-      outline: none;
-      transition: border 0.2s;
+      width: 100%; padding: 14px 16px; background: #1a1a1a;
+      border: 1px solid #333; border-radius: 10px; color: #fff;
+      font-size: 15px; margin-bottom: 14px; outline: none; transition: border 0.2s;
     }
     input:focus { border-color: #25D366; }
     button {
-      width: 100%;
-      padding: 14px;
-      background: #25D366;
-      border: none;
-      border-radius: 10px;
-      color: #000;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
+      width: 100%; padding: 14px; background: #25D366; border: none;
+      border-radius: 10px; color: #000; font-size: 15px; font-weight: bold;
+      cursor: pointer; transition: background 0.2s;
     }
     button:hover { background: #1db954; }
     button:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; }
     .code-box {
-      background: #0d1f14;
-      border: 1px solid #25D366;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 20px;
-      display: none;
+      background: #0d1f14; border: 1px solid #25D366;
+      border-radius: 10px; padding: 20px; margin-top: 20px; display: none;
     }
     .code {
-      font-size: 34px;
-      font-weight: bold;
-      color: #25D366;
-      letter-spacing: 6px;
-      margin: 8px 0;
+      font-size: 34px; font-weight: bold; color: #25D366;
+      letter-spacing: 6px; margin: 8px 0 14px;
     }
-    .status {
-      margin-top: 12px;
-      font-size: 12px;
-      color: #666;
-    }
+    .status { margin-top: 12px; font-size: 12px; color: #666; }
     .error {
-      color: #ff4444;
-      margin-top: 14px;
-      font-size: 13px;
-      display: none;
-      background: #1a0a0a;
-      border: 1px solid #ff4444;
-      border-radius: 8px;
-      padding: 10px;
+      color: #ff4444; margin-top: 14px; font-size: 13px; display: none;
+      background: #1a0a0a; border: 1px solid #ff4444; border-radius: 8px; padding: 10px;
     }
-    .qr-wrap {
-      display: none;
-      margin-top: 20px;
-    }
+    .qr-wrap { display: none; margin-top: 20px; }
     .qr-img {
-      width: 220px;
-      height: 220px;
-      border-radius: 12px;
-      border: 3px solid #25D366;
-      margin: 12px auto;
-      display: block;
-      background: #1a1a1a;
+      width: 220px; height: 220px; border-radius: 12px;
+      border: 3px solid #25D366; margin: 12px auto; display: block; background: #1a1a1a;
     }
-    .session-box {
-      display: none;
-      margin-top: 16px;
-    }
+    .session-box { display: none; margin-top: 16px; }
     .session-key {
-      background: #0d1f14;
-      border: 1px solid #25D366;
-      border-radius: 8px;
-      padding: 14px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #25D366;
-      word-break: break-all;
-      letter-spacing: 2px;
+      background: #0d1f14; border: 1px solid #25D366; border-radius: 8px;
+      padding: 14px; font-size: 16px; font-weight: bold; color: #25D366;
+      word-break: break-all; letter-spacing: 1px;
     }
     .copy-btn {
-      width: 100%;
-      padding: 12px;
-      background: #1a1a1a;
-      border: 1px solid #25D366;
-      border-radius: 8px;
-      color: #25D366;
-      font-size: 14px;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: all 0.2s;
+      width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #25D366;
+      border-radius: 8px; color: #25D366; font-size: 14px; font-weight: bold;
+      cursor: pointer; margin-top: 10px; transition: all 0.2s;
     }
     .copy-btn:hover { background: #25D366; color: #000; }
-    .hint {
-      font-size: 12px;
-      color: #555;
-      margin-bottom: 10px;
-    }
+    .hint { font-size: 12px; color: #555; margin-bottom: 10px; }
     .badge {
-      display: inline-block;
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 11px;
-      color: #666;
-      margin-bottom: 20px;
+      display: inline-block; background: #1a1a1a; border: 1px solid #333;
+      border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #666; margin-bottom: 20px;
     }
   </style>
 </head>
@@ -188,7 +109,13 @@
           Open WhatsApp → Linked Devices → Link with phone number
         </p>
         <div class="code" id="pairCode"></div>
+        <button class="copy-btn" id="copyPairBtn" onclick="copyPairCode()">📋 Copy Code</button>
         <div class="status" id="pairStatus">⏳ Session will be sent to your WhatsApp DM once connected</div>
+        <div class="session-box" id="pairSessionBox" style="margin-top:14px;">
+          <p style="color:#25D366;font-size:13px;margin-bottom:8px">✅ Connected! Your session key:</p>
+          <div class="session-key" id="pairSessionKey"></div>
+          <button class="copy-btn" onclick="copyPairSession()">📋 Copy Session Key</button>
+        </div>
       </div>
       <div class="error" id="pairError"></div>
     </div>
@@ -198,7 +125,7 @@
       <p class="hint">Scan the QR code with WhatsApp → Linked Devices → Link a Device</p>
       <button id="qrBtn" onclick="startQR()">📷 Generate QR Code</button>
       <div class="qr-wrap" id="qrWrap">
-        <img id="qrImg" class="qr-img" alt="QR Code loading..." />
+        <img id="qrImg" class="qr-img" alt="QR Code" />
         <div class="status" id="qrStatus">⏳ Scan the QR code with WhatsApp</div>
         <div class="session-box" id="sessionBox">
           <p style="color:#25D366;font-size:13px;margin-bottom:8px">✅ Connected! Your session key:</p>
@@ -234,6 +161,9 @@
       btn.textContent = '⏳ Connecting...';
       document.getElementById('pairError').style.display = 'none';
       document.getElementById('codeBox').style.display = 'none';
+      document.getElementById('pairSessionBox').style.display = 'none';
+      if (pollInterval) clearInterval(pollInterval);
+
       try {
         const res = await fetch('/pair', {
           method: 'POST',
@@ -248,10 +178,30 @@
           btn.textContent = '🔑 Generate Session';
           return;
         }
+
         document.getElementById('pairCode').textContent = data.code;
         document.getElementById('codeBox').style.display = 'block';
-        document.getElementById('pairStatus').textContent = '⏳ Session will be sent to your WhatsApp DM once connected!';
+        document.getElementById('pairStatus').textContent = '⏳ Enter the code in WhatsApp, session will appear here once connected';
         btn.textContent = '✅ Code Generated!';
+
+        pollInterval = setInterval(async () => {
+          try {
+            const statusRes = await fetch('/status/' + data.sessionId);
+            const status = await statusRes.json();
+            if (status.status === 'connected') {
+              clearInterval(pollInterval);
+              document.getElementById('pairStatus').textContent = '✅ Connected successfully!';
+              document.getElementById('pairSessionKey').textContent = status.session;
+              document.getElementById('pairSessionBox').style.display = 'block';
+            } else if (status.status === 'expired') {
+              clearInterval(pollInterval);
+              document.getElementById('pairStatus').textContent = '❌ Session expired. Please try again.';
+              btn.disabled = false;
+              btn.textContent = '🔑 Generate Session';
+            }
+          } catch (e) {}
+        }, 2000);
+
       } catch (err) {
         document.getElementById('pairError').textContent = '❌ Connection failed. Please try again.';
         document.getElementById('pairError').style.display = 'block';
@@ -263,14 +213,16 @@
     async function startQR() {
       const btn = document.getElementById('qrBtn');
       btn.disabled = true;
-      btn.textContent = '⏳ Connecting...';
+      btn.textContent = '⏳ Generating QR...';
       document.getElementById('qrError').style.display = 'none';
       document.getElementById('qrWrap').style.display = 'none';
       document.getElementById('sessionBox').style.display = 'none';
       if (pollInterval) clearInterval(pollInterval);
+
       try {
         const res = await fetch('/qr', { method: 'POST' });
         const data = await res.json();
+
         if (!data.success) {
           document.getElementById('qrError').textContent = '❌ ' + data.error;
           document.getElementById('qrError').style.display = 'block';
@@ -278,28 +230,30 @@
           btn.textContent = '📷 Generate QR Code';
           return;
         }
+
+        document.getElementById('qrImg').src = data.qr;
         document.getElementById('qrWrap').style.display = 'block';
-        btn.textContent = '✅ QR Generated!';
-        // Poll for QR image and session
+        document.getElementById('qrStatus').textContent = '⏳ Scan the QR code with WhatsApp';
+        btn.textContent = '✅ Scan to Connect';
+
         pollInterval = setInterval(async () => {
           try {
             const statusRes = await fetch('/status/' + data.sessionId);
             const status = await statusRes.json();
-            if (status.status === 'qr') {
-              document.getElementById('qrImg').src = status.qr;
-            } else if (status.status === 'connected') {
+            if (status.status === 'connected') {
               clearInterval(pollInterval);
               document.getElementById('qrStatus').textContent = '✅ Connected successfully!';
               document.getElementById('sessionKey').textContent = status.session;
               document.getElementById('sessionBox').style.display = 'block';
             } else if (status.status === 'expired') {
               clearInterval(pollInterval);
-              document.getElementById('qrStatus').textContent = '❌ Session expired. Please try again.';
+              document.getElementById('qrStatus').textContent = '❌ QR expired. Please generate again.';
               btn.disabled = false;
               btn.textContent = '📷 Generate QR Code';
             }
           } catch (e) {}
         }, 2000);
+
       } catch (err) {
         document.getElementById('qrError').textContent = '❌ Connection failed. Please try again.';
         document.getElementById('qrError').style.display = 'block';
@@ -308,13 +262,27 @@
       }
     }
 
+    function copyPairCode() {
+      const code = document.getElementById('pairCode').textContent.replace(/-/g, '');
+      navigator.clipboard.writeText(code).then(() => {
+        document.getElementById('copyPairBtn').textContent = '✅ Copied!';
+        setTimeout(() => { document.getElementById('copyPairBtn').textContent = '📋 Copy Code'; }, 2000);
+      });
+    }
+
+    function copyPairSession() {
+      const key = document.getElementById('pairSessionKey').textContent;
+      navigator.clipboard.writeText(key).then(() => {
+        event.target.textContent = '✅ Copied!';
+        setTimeout(() => { event.target.textContent = '📋 Copy Session Key'; }, 2000);
+      });
+    }
+
     function copySession() {
       const key = document.getElementById('sessionKey').textContent;
       navigator.clipboard.writeText(key).then(() => {
-        document.querySelector('.copy-btn').textContent = '✅ Copied!';
-        setTimeout(() => {
-          document.querySelector('.copy-btn').textContent = '📋 Copy Session Key';
-        }, 2000);
+        event.target.textContent = '✅ Copied!';
+        setTimeout(() => { event.target.textContent = '📋 Copy Session Key'; }, 2000);
       });
     }
   </script>
