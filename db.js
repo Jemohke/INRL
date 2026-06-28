@@ -4,7 +4,7 @@ import crypto from 'crypto';
 const { Pool } = pg;
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.SESSION_DB_URL,
   ssl: { rejectUnauthorized: false },
   max: 3,
   idleTimeoutMillis: 30000,
