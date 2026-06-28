@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BLACK-MD Session Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 16px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    .logo { font-size: 36px; margin-bottom: 6px; }
+    h1 { font-size: 22px; color: #25D366; margin-bottom: 4px; }
+    .subtitle { color: #666; font-size: 13px; margin-bottom: 24px; }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .tab {
+      flex: 1;
+      padding: 10px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #888;
+      transition: all 0.2s;
+    }
+    .tab.active {
+      border-color: #25D366;
+      color: #25D366;
+      background: #0d1f14;
+    }
+    .section { display: none; }
+    .section.active { display: block; }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 15px;
+      margin-bottom: 14px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    input:focus { border-color: #25D366; }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #25D366;
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #1db954; }
+    button:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; }
+    .code-box {
+      background: #0d1f14;
+      border: 1px solid #25D366;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+    .code {
+      font-size: 34px;
+      font-weight: bold;
+      color: #25D366;
+      letter-spacing: 6px;
+      margin: 8px 0;
+    }
+    .status {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #666;
+    }
+    .error {
+      color: #ff4444;
+      margin-top: 14px;
+      font-size: 13px;
+      display: none;
+      background: #1a0a0a;
+      border: 1px solid #ff4444;
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .qr-wrap {
+      display: none;
+      margin-top: 20px;
+    }
+    .qr-img {
+      width: 220px;
+      height: 220px;
+      border-radius: 12px;
+      border: 3px solid #25D366;
+      margin: 12px auto;
+      display: block;
+      background: #1a1a1a;
+    }
+    .session-box {
+      display: none;
+      margin-top: 16px;
+    }
+    .session-key {
+      background: #0d1f14;
+      border: 1px solid #25D366;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #25D366;
+      word-break: break-all;
+      letter-spacing: 2px;
+    }
+    .copy-btn {
+      width: 100%;
+      padding: 12px;
+      background: #1a1a1a;
+      border: 1px solid #25D366;
+      border-radius: 8px;
+      color: #25D366;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { background: #25D366; color: #000; }
+    .hint {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .badge {
+      display: inline-block;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">⚡</div>
+    <h1>BLACK-MD</h1>
+    <p class="subtitle">WhatsApp Session Generator</p>
+    <div class="badge">🔒 Sessions stored securely in your database</div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('pair')">📱 Pairing Code</div>
+      <div class="tab" onclick="switchTab('qr')">📷 QR Code</div>
+    </div>
+
+    <!-- PAIRING CODE SECTION -->
+    <div class="section active" id="pairSection">
+      <p class="hint">Enter your WhatsApp number with country code</p>
+      <input type="tel" id="phone" placeholder="e.g. 254114283550" />
+      <button id="pairBtn" onclick="pair()">🔑 Generate Session</button>
+      <div class="code-box" id="codeBox">
+        <p style="color:#888;font-size:12px;margin-bottom:6px">
+          Open WhatsApp → Linked Devices → Link with phone number
+        </p>
+        <div class="code" id="pairCode"></div>
+        <div class="status" id="pairStatus">⏳ Session will be sent to your WhatsApp DM once connected</div>
+      </div>
+      <div class="error" id="pairError"></div>
+    </div>
+
+    <!-- QR CODE SECTION -->
+    <div class="section" id="qrSection">
+      <p class="hint">Scan the QR code with WhatsApp → Linked Devices → Link a Device</p>
+      <button id="qrBtn" onclick="startQR()">📷 Generate QR Code</button>
+      <div class="qr-wrap" id="qrWrap">
+        <img id="qrImg" class="qr-img" alt="QR Code loading..." />
+        <div class="status" id="qrStatus">⏳ Scan the QR code with WhatsApp</div>
+        <div class="session-box" id="sessionBox">
+          <p style="color:#25D366;font-size:13px;margin-bottom:8px">✅ Connected! Your session key:</p>
+          <div class="session-key" id="sessionKey"></div>
+          <button class="copy-btn" onclick="copySession()">📋 Copy Session Key</button>
+        </div>
+      </div>
+      <div class="error" id="qrError"></div>
+    </div>
+  </div>
+
+  <script>
+    let pollInterval = null;
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      if (tab === 'pair') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('pairSection').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('qrSection').classList.add('active');
+      }
+      if (pollInterval) clearInterval(pollInterval);
+    }
+
+    async function pair() {
+      const phone = document.getElementById('phone').value.trim();
+      if (!phone) return alert('Please enter your phone number!');
+      const btn = document.getElementById('pairBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Connecting...';
+      document.getElementById('pairError').style.display = 'none';
+      document.getElementById('codeBox').style.display = 'none';
+      try {
+        const res = await fetch('/pair', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          document.getElementById('pairError').textContent = '❌ ' + data.error;
+          document.getElementById('pairError').style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = '🔑 Generate Session';
+          return;
+        }
+        document.getElementById('pairCode').textContent = data.code;
+        document.getElementById('codeBox').style.display = 'block';
+        document.getElementById('pairStatus').textContent = '⏳ Session will be sent to your WhatsApp DM once connected!';
+        btn.textContent = '✅ Code Generated!';
+      } catch (err) {
+        document.getElementById('pairError').textContent = '❌ Connection failed. Please try again.';
+        document.getElementById('pairError').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '🔑 Generate Session';
+      }
+    }
+
+    async function startQR() {
+      const btn = document.getElementById('qrBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Connecting...';
+      document.getElementById('qrError').style.display = 'none';
+      document.getElementById('qrWrap').style.display = 'none';
+      document.getElementById('sessionBox').style.display = 'none';
+      if (pollInterval) clearInterval(pollInterval);
+      try {
+        const res = await fetch('/qr', { method: 'POST' });
+        const data = await res.json();
+        if (!data.success) {
+          document.getElementById('qrError').textContent = '❌ ' + data.error;
+          document.getElementById('qrError').style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = '📷 Generate QR Code';
+          return;
+        }
+        document.getElementById('qrWrap').style.display = 'block';
+        btn.textContent = '✅ QR Generated!';
+        // Poll for QR image and session
+        pollInterval = setInterval(async () => {
+          try {
+            const statusRes = await fetch('/status/' + data.sessionId);
+            const status = await statusRes.json();
+            if (status.status === 'qr') {
+              document.getElementById('qrImg').src = status.qr;
+            } else if (status.status === 'connected') {
+              clearInterval(pollInterval);
+              document.getElementById('qrStatus').textContent = '✅ Connected successfully!';
+              document.getElementById('sessionKey').textContent = status.session;
+              document.getElementById('sessionBox').style.display = 'block';
+            } else if (status.status === 'expired') {
+              clearInterval(pollInterval);
+              document.getElementById('qrStatus').textContent = '❌ Session expired. Please try again.';
+              btn.disabled = false;
+              btn.textContent = '📷 Generate QR Code';
+            }
+          } catch (e) {}
+        }, 2000);
+      } catch (err) {
+        document.getElementById('qrError').textContent = '❌ Connection failed. Please try again.';
+        document.getElementById('qrError').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '📷 Generate QR Code';
+      }
+    }
+
+    function copySession() {
+      const key = document.getElementById('sessionKey').textContent;
+      navigator.clipboard.writeText(key).then(() => {
+        document.querySelector('.copy-btn').textContent = '✅ Copied!';
+        setTimeout(() => {
+          document.querySelector('.copy-btn').textContent = '📋 Copy Session Key';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
