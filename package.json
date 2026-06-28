@@ -1,0 +1,19 @@
+{
+  "name": "black-md-session",
+  "version": "1.0.0",
+  "description": "BLACK-MD WhatsApp Session Generator",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "npm:keithbaileys",
+    "@hapi/boom": "^10.0.0",
+    "pino": "^8.21.0",
+    "pg": "^8.13.3",
+    "express": "latest",
+    "dotenv": "^17.3.1",
+    "qrcode": "^1.5.4"
+  }
+}
