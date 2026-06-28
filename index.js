@@ -15,10 +15,12 @@ app.use(express.static('public'));
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  max: 3,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000
 });
 
-// Create sessions table
 pool.query(`
   CREATE TABLE IF NOT EXISTS sessions (
     id SERIAL PRIMARY KEY,
@@ -29,18 +31,25 @@ pool.query(`
   );
 `).then(() => console.log('✅ Sessions table ready')).catch(console.error);
 
-// Generate short random key (8 chars)
 function generateKey() {
   return crypto.randomBytes(4).toString('hex').toUpperCase();
 }
 
 const activeSessions = new Map();
 
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, entry] of activeSessions.entries()) {
+    if (entry.closedAt && now - entry.closedAt > 30000) {
+      activeSessions.delete(id);
+    }
+  }
+}, 15000);
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ─── PAIRING CODE ────────────────────────────────────────────
 app.post('/pair', async (req, res) => {
   const { phone } = req.body;
   if (!phone) return res.json({ success: false, error: 'Phone number required' });
@@ -65,15 +74,14 @@ app.post('/pair', async (req, res) => {
     const code = await sock.requestPairingCode(phone.replace(/[^0-9]/g, ''));
     const formatted = code.match(/.{1,4}/g).join('-');
 
-    sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
+    sock.ev.on('connection.update', async ({ connection }) => {
       if (connection === 'open') {
         try {
           const credsPath = path.join(sessionDir, 'creds.json');
           await new Promise(r => setTimeout(r, 3000));
           const creds = fs.readFileSync(credsPath, 'utf8');
 
-          let sessionKey;
-          let saved = false;
+          let sessionKey, saved = false;
           while (!saved) {
             sessionKey = generateKey();
             try {
@@ -86,24 +94,26 @@ app.post('/pair', async (req, res) => {
           }
 
           const fullSession = `BLACK-MD:~${sessionKey}`;
+          const entry = activeSessions.get(sessionId);
+          if (entry) entry.session = fullSession;
 
           await sock.sendMessage(sock.user.id, {
             text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n*Your session key:*\n\`\`\`${fullSession}\`\`\`\n\n⚠️ *Keep this private! Don't share it with anyone.*\n\n📌 Copy and paste it as your SESSION env variable.`
           });
 
           console.log(`✅ Session saved: ${fullSession}`);
-
           setTimeout(() => {
             try { fs.rmSync(sessionDir, { recursive: true }); } catch {}
             activeSessions.delete(sessionId);
-          }, 5000);
+          }, 10000);
 
         } catch (err) {
           console.error('❌ Error saving session:', err.message);
         }
       } else if (connection === 'close') {
+        const entry = activeSessions.get(sessionId);
+        if (entry) entry.closedAt = Date.now();
         try { fs.rmSync(sessionDir, { recursive: true }); } catch {}
-        activeSessions.delete(sessionId);
       }
     });
 
@@ -115,11 +125,21 @@ app.post('/pair', async (req, res) => {
   }
 });
 
-// ─── QR CODE ─────────────────────────────────────────────────
 app.post('/qr', async (req, res) => {
   const sessionId = 'session_' + Date.now();
   const sessionDir = path.join(__dirname, 'temp', sessionId);
   fs.mkdirSync(sessionDir, { recursive: true });
+
+  let responded = false;
+
+  const timeout = setTimeout(() => {
+    if (!responded) {
+      responded = true;
+      try { fs.rmSync(sessionDir, { recursive: true }); } catch {}
+      activeSessions.delete(sessionId);
+      res.json({ success: false, error: 'Timed out waiting for QR. Please try again.' });
+    }
+  }, 20000);
 
   try {
     const { state, saveCreds } = await useMultiFileAuthState(sessionDir);
@@ -133,11 +153,14 @@ app.post('/qr', async (req, res) => {
     activeSessions.set(sessionId, { sock, sessionDir, saveCreds });
     sock.ev.on('creds.update', saveCreds);
 
-    sock.ev.on('connection.update', async ({ connection, qr, lastDisconnect }) => {
-      if (qr) {
+    sock.ev.on('connection.update', async ({ connection, qr }) => {
+      if (qr && !responded) {
+        responded = true;
+        clearTimeout(timeout);
         const qrImage = await QRCode.toDataURL(qr);
         const entry = activeSessions.get(sessionId);
         if (entry) entry.qr = qrImage;
+        res.json({ success: true, sessionId, qr: qrImage });
       }
 
       if (connection === 'open') {
@@ -146,8 +169,7 @@ app.post('/qr', async (req, res) => {
           await new Promise(r => setTimeout(r, 3000));
           const creds = fs.readFileSync(credsPath, 'utf8');
 
-          let sessionKey;
-          let saved = false;
+          let sessionKey, saved = false;
           while (!saved) {
             sessionKey = generateKey();
             try {
@@ -168,30 +190,32 @@ app.post('/qr', async (req, res) => {
           });
 
           console.log(`✅ Session saved: ${fullSession}`);
-
           setTimeout(() => {
             try { fs.rmSync(sessionDir, { recursive: true }); } catch {}
             activeSessions.delete(sessionId);
-          }, 5000);
+          }, 10000);
 
         } catch (err) {
           console.error('❌ Error saving session:', err.message);
         }
       } else if (connection === 'close') {
+        const entry = activeSessions.get(sessionId);
+        if (entry) entry.closedAt = Date.now();
         try { fs.rmSync(sessionDir, { recursive: true }); } catch {}
-        activeSessions.delete(sessionId);
       }
     });
 
-    res.json({ success: true, sessionId });
-
   } catch (err) {
-    try { fs.rmSync(sessionDir, { recursive: true }); } catch {}
-    res.json({ success: false, error: err.message });
+    if (!responded) {
+      responded = true;
+      clearTimeout(timeout);
+      try { fs.rmSync(sessionDir, { recursive: true }); } catch {}
+      activeSessions.delete(sessionId);
+      res.json({ success: false, error: err.message });
+    }
   }
 });
 
-// ─── GET SESSION (for bots to fetch creds using short key) ───
 app.get('/getsession', async (req, res) => {
   const { key } = req.query;
   if (!key) return res.json({ success: false, error: 'No key provided' });
@@ -207,11 +231,11 @@ app.get('/getsession', async (req, res) => {
   }
 });
 
-// ─── STATUS POLLING ───────────────────────────────────────────
 app.get('/status/:sessionId', (req, res) => {
   const entry = activeSessions.get(req.params.sessionId);
   if (!entry) return res.json({ status: 'expired' });
   if (entry.session) return res.json({ status: 'connected', session: entry.session });
+  if (entry.closedAt) return res.json({ status: 'expired' });
   if (entry.qr) return res.json({ status: 'qr', qr: entry.qr });
   res.json({ status: 'waiting' });
 });
