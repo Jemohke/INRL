@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BLACK-MD QR</title>
+  <style>
+    body {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100vh; margin: 0;
+      background-size: cover; animation: changeBackground 15s infinite;
+      font-family: Arial, sans-serif;
+    }
+    @keyframes changeBackground {
+      10%, 100% { background-image: url('https://files.catbox.moe/li9riq.jpg'); }
+      25%        { background-image: url('https://files.catbox.moe/84bdiz.jpg'); }
+      50%        { background-image: url('https://files.catbox.moe/zwmfbf.jpg'); }
+      75%        { background-image: url('https://files.catbox.moe/af1sso.jpg'); }
+    }
+    .box {
+      background: #0057FF; border-radius: 10px; padding: 24px;
+      text-align: center; max-width: 320px; width: 90%;
+    }
+    h3 { color: #000; margin-bottom: 8px; }
+    p  { color: #000; font-size: 13px; margin-bottom: 16px; }
+    .qr-wrap {
+      background: white; border-radius: 8px; padding: 10px;
+      display: inline-block; margin-bottom: 14px;
+    }
+    .qr-wrap img { width: 220px; height: 220px; display: block; }
+    .status { color: #000; font-size: 13px; font-weight: bold; }
+    .btn {
+      margin-top: 16px; padding: 10px 24px; background: #25D366;
+      border: none; border-radius: 8px; color: #000; font-weight: bold;
+      font-size: 14px; cursor: pointer;
+    }
+    .btn:hover { background: #1db954; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h3>BLACK-MD QR LOGIN</h3>
+    <p>Scan with WhatsApp → Linked Devices → Link a Device<br>
+       Your session key will be sent to your WhatsApp DM.</p>
+    <div class="qr-wrap">
+      <img id="qrImg" src="" alt="Loading QR..." />
+    </div>
+    <div class="status" id="status">⏳ Loading QR code...</div>
+    <br>
+    <button class="btn" onclick="loadQR()">🔄 Refresh QR</button>
+  </div>
+  <script>
+    function loadQR() {
+      const img = document.getElementById('qrImg');
+      const status = document.getElementById('status');
+      status.textContent = '⏳ Loading QR code...';
+      img.src = '/qr?' + Date.now();
+      img.onload = () => { status.textContent = '📷 Scan now! Session key will arrive in your WhatsApp DM.'; };
+      img.onerror = () => { status.textContent = '❌ Failed to load QR. Click Refresh to try again.'; };
+    }
+    loadQR();
+  </script>
+</body>
+</html>
