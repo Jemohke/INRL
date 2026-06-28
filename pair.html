@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>𝗕𝗟𝗔𝗖𝗞'𝗦 𝗣𝗔𝗜𝗥</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+      background-size: cover;
+      animation: changeBackground 15s infinite;
+    }
+    @keyframes changeBackground {
+      10%, 100% { background-image: url('https://files.catbox.moe/li9riq.jpg'); }
+      25%        { background-image: url('https://files.catbox.moe/84bdiz.jpg'); }
+      50%        { background-image: url('https://files.catbox.moe/zwmfbf.jpg'); }
+      75%        { background-image: url('https://files.catbox.moe/af1sso.jpg'); }
+    }
+    .container { display: flex; flex-direction: column; align-items: center; z-index: 1; }
+    .box {
+      width: 300px; height: auto; padding: 20px;
+      text-align: center; background-color: #0057FF;
+      border-radius: 10px; position: relative;
+    }
+    #text { color: #000; }
+    .input-container {
+      display: flex; background: white; border-radius: 1rem;
+      background: linear-gradient(45deg, #c5c5c5 0%, #ffffff 100%);
+      padding: 0.3rem; gap: 0.3rem; max-width: 300px; width: 100%;
+    }
+    .input-container input {
+      border-radius: 0.8rem 0 0 0.8rem;
+      background: #e8e8e8; width: 89%; flex-basis: 75%;
+      padding: 1rem; border: none; border-left: 2px solid #ff9d9d;
+      color: #5e5e5e; transition: all 0.2s ease-in-out;
+    }
+    .input-container input:focus { border-left: 2px solid #ff9d9d; outline: none; }
+    .input-container button {
+      flex-basis: 25%; padding: 1rem;
+      background: linear-gradient(135deg, #8a2be2 0%, #800080 100%);
+      font-weight: 900; letter-spacing: 0.3rem; text-transform: uppercase;
+      color: white; border: none; width: 100%;
+      border-radius: 0 1rem 1rem 0; transition: all 0.2s ease-in-out;
+    }
+    .input-container button:hover { background: linear-gradient(135deg, #A8E4A0 0%, #32CD32 100%); color: red; }
+    @media (max-width: 500px) {
+      .input-container { flex-direction: column; }
+      .input-container input { border-radius: 0.8rem; }
+      .input-container button { padding: 1rem; border-radius: 0.8rem; }
+    }
+    .centered-text { text-align: center; }
+    .music-button-container { display: flex; justify-content: center; margin-top: 10px; }
+    .music-button {
+      background-color: #007bff; color: white; border: none;
+      padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px;
+    }
+    .music-button:hover { background-color: #0056b3; }
+    .countdown { font-size: 12px; color: #000; margin-top: 6px; display: none; }
+    .countdown.urgent { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+      <div class="box" id="box">
+        <div id="text">
+          <i class="fa fa-user"></i>
+          <p>
+            <h3 class="centered-text">BLACK-MD PAIR</h3>
+            <br>
+            <h4>Ultimate WhatsApp Automation Powerhouse.</h4>
+            <br>
+            <div class="input-container">
+              <input type="number" id="number" placeholder="254114XXX">
+              <button id="submit">enter</button>
+            </div>
+            <a id="waiting-message" class="centered-text" style="display:none;">wait a moment...</a>
+            <br>
+            <main id="pair"></main>
+            <div class="countdown" id="countdown">Code expires in <span id="timer">60</span>s</div>
+            <br>
+            <div class="music-button-container">
+              <button class="music-button" onclick="toggleMusic()">
+                <i class="fas fa-music"></i> Play/Pause Music
+              </button>
+              <audio id="backgroundMusic" loop src="https://files.catbox.moe/bhj66x.m4a"></audio>
+            </div>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+  <script>
+    let a = document.getElementById("pair");
+    let b = document.getElementById("submit");
+    let c = document.getElementById("number");
+    let backgroundMusic = document.getElementById("backgroundMusic");
+    let isPlaying = false;
+    let countdownInterval = null;
+
+    function startCountdown() {
+      const countdownEl = document.getElementById('countdown');
+      const timerEl = document.getElementById('timer');
+      countdownEl.style.display = 'block';
+      countdownEl.classList.remove('urgent');
+      let remaining = 60;
+      timerEl.textContent = remaining;
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        remaining--;
+        timerEl.textContent = Math.max(0, remaining);
+        if (remaining <= 15) countdownEl.classList.add('urgent');
+        if (remaining <= 0) {
+          clearInterval(countdownInterval);
+          countdownEl.textContent = 'Code expired. Please generate a new one.';
+        }
+      }, 1000);
+    }
+
+    async function Copy() {
+      let obj = document.getElementById("copy");
+      let original = obj.innerText;
+      await navigator.clipboard.writeText(obj.getAttribute('data-code'));
+      obj.innerText = "COPIED ✅";
+      obj.style.color = "blue";
+      setTimeout(() => {
+        obj.innerText = original;
+        obj.style.color = "red";
+      }, 1000);
+    }
+
+    b.addEventListener("click", async (e) => {
+      e.preventDefault();
+      if (countdownInterval) clearInterval(countdownInterval);
+      document.getElementById('countdown').style.display = 'none';
+
+      if (!c.value) {
+        a.innerHTML = '<a style="color:black;font-weight:bold">Please Enter Your Number</a><br><br>';
+      } else if (c.value.replace(/[^0-9]/g, "").length < 11) {
+        a.innerHTML = '<a style="color:black;font-weight:bold">Please Give Valid Number (with country code)</a><br><br>';
+      } else {
+        const bc = c.value.replace(/[^0-9]/g, "");
+        let bb = "";
+        let bbc = "";
+        const cc = bc.split('');
+        cc.map(ch => {
+          bbc += ch;
+          if (bbc.length == 3 || bbc.length == 8) bb += " " + ch;
+          else bb += ch;
+        });
+        c.type = "text";
+        c.value = "+" + bb;
+        c.style = "color:black;font-size:20px";
+        a.innerHTML = '<a style="color:black;font-weight:bold">Please Wait...</a><br><br>';
+        try {
+          let { data } = await axios(`/code?number=${bc}`);
+          let code = data.code || "Service Unavailable";
+          if (code !== "Service Unavailable") {
+            a.innerHTML = `<font id="copy" data-code="${code}" onclick="Copy()" style="color:red;font-weight:bold;cursor:pointer" size="5">CODE: <span style="color:black;font-weight:bold">${code}</span><br><small style="color:#555">(tap to copy)</small></font><br><br><small style="color:#000">Session key will be sent to your WhatsApp DM after linking.</small><br><br>`;
+            startCountdown();
+          } else {
+            a.innerHTML = '<a style="color:red;font-weight:bold">Service Unavailable. Please try again.</a><br><br>';
+          }
+        } catch (err) {
+          a.innerHTML = '<a style="color:red;font-weight:bold">Connection failed. Please try again.</a><br><br>';
+        }
+      }
+    });
+
+    function toggleMusic() {
+      if (isPlaying) { backgroundMusic.pause(); isPlaying = false; }
+      else { backgroundMusic.play(); isPlaying = true; }
+    }
+  </script>
+</body>
+</html>
