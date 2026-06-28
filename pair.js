@@ -1,7 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import pino from 'pino';
-import { makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
+import { makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, delay, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 import { saveSession } from './db.js';
 
 const router = express.Router();
@@ -23,6 +23,7 @@ router.get('/', async (req, res) => {
   const MAX_RETRIES = 3;
 
   async function initiateSession() {
+    const { version } = await fetchLatestBaileysVersion();  
     const { state, saveCreds } = await useMultiFileAuthState(dirs);
     try {
       const sock = makeWASocket({
@@ -30,7 +31,7 @@ router.get('/', async (req, res) => {
           creds: state.creds,
           keys: makeCacheableSignalKeyStore(state.keys, pino({ level: 'fatal' }).child({ level: 'fatal' })),
         },
-        version: [2, 3000, 1033105955],
+        version,
         printQRInTerminal: false,
         logger: pino({ level: 'silent' }),
         browser: Browsers.windows('Edge'),
