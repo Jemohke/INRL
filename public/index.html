@@ -7,40 +7,30 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #0a0a0a;
-      color: #fff;
+      background: #0a0a0a; color: #fff;
       font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
     }
     .container {
-      background: #111;
-      border: 1px solid #222;
-      border-radius: 16px;
-      padding: 36px 32px;
-      width: 100%;
-      max-width: 420px;
-      text-align: center;
+      background: #111; border: 1px solid #222; border-radius: 16px;
+      padding: 36px 32px; width: 100%; max-width: 420px; text-align: center;
     }
     .logo { font-size: 36px; margin-bottom: 6px; }
     h1 { font-size: 22px; color: #25D366; margin-bottom: 4px; }
     .subtitle { color: #666; font-size: 13px; margin-bottom: 24px; }
     .tabs { display: flex; gap: 8px; margin-bottom: 24px; }
     .tab {
-      flex: 1; padding: 10px; background: #1a1a1a;
-      border: 1px solid #333; border-radius: 8px;
-      cursor: pointer; font-size: 13px; color: #888; transition: all 0.2s;
+      flex: 1; padding: 10px; background: #1a1a1a; border: 1px solid #333;
+      border-radius: 8px; cursor: pointer; font-size: 13px; color: #888; transition: all 0.2s;
     }
     .tab.active { border-color: #25D366; color: #25D366; background: #0d1f14; }
     .section { display: none; }
     .section.active { display: block; }
     input {
-      width: 100%; padding: 14px 16px; background: #1a1a1a;
-      border: 1px solid #333; border-radius: 10px; color: #fff;
-      font-size: 15px; margin-bottom: 14px; outline: none; transition: border 0.2s;
+      width: 100%; padding: 14px 16px; background: #1a1a1a; border: 1px solid #333;
+      border-radius: 10px; color: #fff; font-size: 15px; margin-bottom: 14px;
+      outline: none; transition: border 0.2s;
     }
     input:focus { border-color: #25D366; }
     button {
@@ -51,13 +41,18 @@
     button:hover { background: #1db954; }
     button:disabled { background: #2a2a2a; color: #555; cursor: not-allowed; }
     .code-box {
-      background: #0d1f14; border: 1px solid #25D366;
-      border-radius: 10px; padding: 20px; margin-top: 20px; display: none;
+      background: #0d1f14; border: 1px solid #25D366; border-radius: 10px;
+      padding: 20px; margin-top: 20px; display: none;
     }
     .code {
       font-size: 34px; font-weight: bold; color: #25D366;
-      letter-spacing: 6px; margin: 8px 0 14px;
+      letter-spacing: 6px; margin: 8px 0 6px;
     }
+    .countdown {
+      font-size: 12px; color: #888; margin-bottom: 12px;
+    }
+    .countdown span { color: #25D366; font-weight: bold; }
+    .countdown.urgent span { color: #ff4444; }
     .status { margin-top: 12px; font-size: 12px; color: #666; }
     .error {
       color: #ff4444; margin-top: 14px; font-size: 13px; display: none;
@@ -65,8 +60,13 @@
     }
     .qr-wrap { display: none; margin-top: 20px; }
     .qr-img {
-      width: 220px; height: 220px; border-radius: 12px;
-      border: 3px solid #25D366; margin: 12px auto; display: block; background: #1a1a1a;
+      width: 220px; height: 220px; border-radius: 12px; border: 3px solid #25D366;
+      margin: 12px auto; display: block; background: #1a1a1a;
+    }
+    .spinner {
+      width: 220px; height: 220px; border-radius: 12px; border: 3px solid #25D366;
+      margin: 12px auto; display: flex; align-items: center; justify-content: center;
+      background: #0d1f14; color: #25D366; font-size: 13px;
     }
     .session-box { display: none; margin-top: 16px; }
     .session-key {
@@ -85,6 +85,7 @@
       display: inline-block; background: #1a1a1a; border: 1px solid #333;
       border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #666; margin-bottom: 20px;
     }
+    .connecting-msg { color: #888; font-size: 13px; margin-top: 14px; display: none; }
   </style>
 </head>
 <body>
@@ -104,17 +105,19 @@
       <p class="hint">Enter your WhatsApp number with country code</p>
       <input type="tel" id="phone" placeholder="e.g. 254114283550" />
       <button id="pairBtn" onclick="pair()">🔑 Generate Session</button>
+      <p class="connecting-msg" id="pairConnecting">⏳ Connecting to WhatsApp, please wait...</p>
       <div class="code-box" id="codeBox">
         <p style="color:#888;font-size:12px;margin-bottom:6px">
           Open WhatsApp → Linked Devices → Link with phone number
         </p>
         <div class="code" id="pairCode"></div>
+        <div class="countdown" id="pairCountdown">Code expires in <span id="pairTimer">60</span>s</div>
         <button class="copy-btn" id="copyPairBtn" onclick="copyPairCode()">📋 Copy Code</button>
-        <div class="status" id="pairStatus">⏳ Session will be sent to your WhatsApp DM once connected</div>
+        <div class="status" id="pairStatus">⏳ Enter the code in WhatsApp now</div>
         <div class="session-box" id="pairSessionBox" style="margin-top:14px;">
           <p style="color:#25D366;font-size:13px;margin-bottom:8px">✅ Connected! Your session key:</p>
           <div class="session-key" id="pairSessionKey"></div>
-          <button class="copy-btn" onclick="copyPairSession()">📋 Copy Session Key</button>
+          <button class="copy-btn" id="copyPairSessionBtn" onclick="copyPairSession()">📋 Copy Session Key</button>
         </div>
       </div>
       <div class="error" id="pairError"></div>
@@ -125,12 +128,13 @@
       <p class="hint">Scan the QR code with WhatsApp → Linked Devices → Link a Device</p>
       <button id="qrBtn" onclick="startQR()">📷 Generate QR Code</button>
       <div class="qr-wrap" id="qrWrap">
-        <img id="qrImg" class="qr-img" alt="QR Code" />
-        <div class="status" id="qrStatus">⏳ Scan the QR code with WhatsApp</div>
+        <div class="spinner" id="qrSpinner">⏳ Generating QR...</div>
+        <img id="qrImg" class="qr-img" alt="QR Code" style="display:none;" />
+        <div class="status" id="qrStatus">⏳ Connecting to WhatsApp...</div>
         <div class="session-box" id="sessionBox">
           <p style="color:#25D366;font-size:13px;margin-bottom:8px">✅ Connected! Your session key:</p>
           <div class="session-key" id="sessionKey"></div>
-          <button class="copy-btn" onclick="copySession()">📋 Copy Session Key</button>
+          <button class="copy-btn" id="copySessionBtn" onclick="copySession()">📋 Copy Session Key</button>
         </div>
       </div>
       <div class="error" id="qrError"></div>
@@ -139,6 +143,7 @@
 
   <script>
     let pollInterval = null;
+    let countdownInterval = null;
 
     function switchTab(tab) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -151,6 +156,7 @@
         document.getElementById('qrSection').classList.add('active');
       }
       if (pollInterval) clearInterval(pollInterval);
+      if (countdownInterval) clearInterval(countdownInterval);
     }
 
     async function pair() {
@@ -162,7 +168,9 @@
       document.getElementById('pairError').style.display = 'none';
       document.getElementById('codeBox').style.display = 'none';
       document.getElementById('pairSessionBox').style.display = 'none';
+      document.getElementById('pairConnecting').style.display = 'block';
       if (pollInterval) clearInterval(pollInterval);
+      if (countdownInterval) clearInterval(countdownInterval);
 
       try {
         const res = await fetch('/pair', {
@@ -174,28 +182,54 @@
         if (!data.success) {
           document.getElementById('pairError').textContent = '❌ ' + data.error;
           document.getElementById('pairError').style.display = 'block';
+          document.getElementById('pairConnecting').style.display = 'none';
           btn.disabled = false;
           btn.textContent = '🔑 Generate Session';
           return;
         }
 
-        document.getElementById('pairCode').textContent = data.code;
-        document.getElementById('codeBox').style.display = 'block';
-        document.getElementById('pairStatus').textContent = '⏳ Enter the code in WhatsApp, session will appear here once connected';
-        btn.textContent = '✅ Code Generated!';
-
+        // Poll for code then session
         pollInterval = setInterval(async () => {
           try {
             const statusRes = await fetch('/status/' + data.sessionId);
             const status = await statusRes.json();
+
+            if (status.status === 'code' && document.getElementById('codeBox').style.display === 'none') {
+              document.getElementById('pairConnecting').style.display = 'none';
+              document.getElementById('pairCode').textContent = status.code;
+              document.getElementById('codeBox').style.display = 'block';
+              document.getElementById('pairStatus').textContent = '⏳ Enter the code in WhatsApp now';
+              btn.textContent = '✅ Code Generated!';
+
+              // Start countdown from when code was created
+              const elapsed = Math.floor((Date.now() - status.codeAt) / 1000);
+              let remaining = Math.max(0, 60 - elapsed);
+              const timerEl = document.getElementById('pairTimer');
+              const countdownEl = document.getElementById('pairCountdown');
+              timerEl.textContent = remaining;
+              if (countdownInterval) clearInterval(countdownInterval);
+              countdownInterval = setInterval(() => {
+                remaining--;
+                timerEl.textContent = Math.max(0, remaining);
+                if (remaining <= 15) countdownEl.classList.add('urgent');
+                if (remaining <= 0) clearInterval(countdownInterval);
+              }, 1000);
+            }
+
             if (status.status === 'connected') {
               clearInterval(pollInterval);
+              if (countdownInterval) clearInterval(countdownInterval);
               document.getElementById('pairStatus').textContent = '✅ Connected successfully!';
               document.getElementById('pairSessionKey').textContent = status.session;
               document.getElementById('pairSessionBox').style.display = 'block';
+              document.getElementById('pairCountdown').style.display = 'none';
             } else if (status.status === 'expired') {
               clearInterval(pollInterval);
-              document.getElementById('pairStatus').textContent = '❌ Session expired. Please try again.';
+              if (countdownInterval) clearInterval(countdownInterval);
+              document.getElementById('pairConnecting').style.display = 'none';
+              const msg = status.error || 'Session expired or code not entered in time. Please try again.';
+              document.getElementById('pairError').textContent = '❌ ' + msg;
+              document.getElementById('pairError').style.display = 'block';
               btn.disabled = false;
               btn.textContent = '🔑 Generate Session';
             }
@@ -203,6 +237,7 @@
         }, 2000);
 
       } catch (err) {
+        document.getElementById('pairConnecting').style.display = 'none';
         document.getElementById('pairError').textContent = '❌ Connection failed. Please try again.';
         document.getElementById('pairError').style.display = 'block';
         btn.disabled = false;
@@ -213,10 +248,12 @@
     async function startQR() {
       const btn = document.getElementById('qrBtn');
       btn.disabled = true;
-      btn.textContent = '⏳ Generating QR...';
+      btn.textContent = '⏳ Connecting...';
       document.getElementById('qrError').style.display = 'none';
       document.getElementById('qrWrap').style.display = 'none';
       document.getElementById('sessionBox').style.display = 'none';
+      document.getElementById('qrImg').style.display = 'none';
+      document.getElementById('qrSpinner').style.display = 'flex';
       if (pollInterval) clearInterval(pollInterval);
 
       try {
@@ -231,23 +268,44 @@
           return;
         }
 
-        document.getElementById('qrImg').src = data.qr;
         document.getElementById('qrWrap').style.display = 'block';
-        document.getElementById('qrStatus').textContent = '⏳ Scan the QR code with WhatsApp';
-        btn.textContent = '✅ Scan to Connect';
+        document.getElementById('qrStatus').textContent = '⏳ Connecting to WhatsApp...';
+        btn.textContent = '⏳ Waiting for QR...';
 
+        let waited = 0;
         pollInterval = setInterval(async () => {
+          waited += 2;
           try {
             const statusRes = await fetch('/status/' + data.sessionId);
             const status = await statusRes.json();
-            if (status.status === 'connected') {
+
+            if (status.status === 'qr') {
+              document.getElementById('qrSpinner').style.display = 'none';
+              document.getElementById('qrImg').src = status.qr;
+              document.getElementById('qrImg').style.display = 'block';
+              document.getElementById('qrStatus').textContent = '⏳ Scan with WhatsApp now (expires in ~60s)';
+              btn.textContent = '✅ Scan to Connect';
+            } else if (status.status === 'connected') {
               clearInterval(pollInterval);
               document.getElementById('qrStatus').textContent = '✅ Connected successfully!';
               document.getElementById('sessionKey').textContent = status.session;
               document.getElementById('sessionBox').style.display = 'block';
             } else if (status.status === 'expired') {
               clearInterval(pollInterval);
-              document.getElementById('qrStatus').textContent = '❌ QR expired. Please generate again.';
+              document.getElementById('qrSpinner').style.display = 'none';
+              const msg = status.error || 'QR expired. Please try again.';
+              document.getElementById('qrError').textContent = '❌ ' + msg;
+              document.getElementById('qrError').style.display = 'block';
+              document.getElementById('qrWrap').style.display = 'none';
+              btn.disabled = false;
+              btn.textContent = '📷 Generate QR Code';
+            } else if (waited >= 90) {
+              // Give up after 90 seconds of polling
+              clearInterval(pollInterval);
+              document.getElementById('qrSpinner').style.display = 'none';
+              document.getElementById('qrError').textContent = '❌ Timed out. Render may be waking up — please try again.';
+              document.getElementById('qrError').style.display = 'block';
+              document.getElementById('qrWrap').style.display = 'none';
               btn.disabled = false;
               btn.textContent = '📷 Generate QR Code';
             }
@@ -273,16 +331,16 @@
     function copyPairSession() {
       const key = document.getElementById('pairSessionKey').textContent;
       navigator.clipboard.writeText(key).then(() => {
-        event.target.textContent = '✅ Copied!';
-        setTimeout(() => { event.target.textContent = '📋 Copy Session Key'; }, 2000);
+        document.getElementById('copyPairSessionBtn').textContent = '✅ Copied!';
+        setTimeout(() => { document.getElementById('copyPairSessionBtn').textContent = '📋 Copy Session Key'; }, 2000);
       });
     }
 
     function copySession() {
       const key = document.getElementById('sessionKey').textContent;
       navigator.clipboard.writeText(key).then(() => {
-        event.target.textContent = '✅ Copied!';
-        setTimeout(() => { event.target.textContent = '📋 Copy Session Key'; }, 2000);
+        document.getElementById('copySessionBtn').textContent = '✅ Copied!';
+        setTimeout(() => { document.getElementById('copySessionBtn').textContent = '📋 Copy Session Key'; }, 2000);
       });
     }
   </script>
