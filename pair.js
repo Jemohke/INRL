@@ -2,7 +2,6 @@ import express from 'express';
 import fs from 'fs';
 import pino from 'pino';
 import { makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, delay, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
-import { saveSession } from './db.js';
 
 const router = express.Router();
 
@@ -23,7 +22,7 @@ router.get('/', async (req, res) => {
   const MAX_RETRIES = 3;
 
   async function initiateSession() {
-    const { version } = await fetchLatestBaileysVersion();  
+    const { version } = await fetchLatestBaileysVersion();
     const { state, saveCreds } = await useMultiFileAuthState(dirs);
     try {
       const sock = makeWASocket({
@@ -53,15 +52,15 @@ router.get('/', async (req, res) => {
           try {
             await delay(5000);
             const creds = JSON.parse(fs.readFileSync(`${dirs}/creds.json`, 'utf8'));
-            const sessionId = await saveSession(creds, num);
+            const sessionId = `BLACK-MD:~${Buffer.from(JSON.stringify(creds)).toString('base64')}`;
 
             await sock.sendMessage(sock.user.id, {
               text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n*Your session key:*\n\`\`\`${sessionId}\`\`\`\n\n⚠️ *Keep this private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
             });
 
-            console.log(`✅ Session saved for ${num}: ${sessionId}`);
+            console.log(`✅ Session sent to ${num}`);
           } catch (err) {
-            console.error('❌ Error saving session:', err.message);
+            console.error('❌ Error sending session:', err.message);
           } finally {
             await delay(1000);
             sock.end();
