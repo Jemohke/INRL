@@ -38,8 +38,10 @@ router.get('/', async (req, res) => {
       });
 
       if (!sock.authState.creds.registered) {
-        await delay(1500);
-        const code = await sock.requestPairingCode(num.replace(/[^0-9]/g, ''));
+        await delay(2000);
+        num = num.replace(/[^0-9]/g, '');
+        const custom = 'BLACKBOT';
+        const code = await sock.requestPairingCode(num,custom);
         if (!res.headersSent) {
           console.log({ num, code });
           res.json({ code });
@@ -56,7 +58,10 @@ router.get('/', async (req, res) => {
             const sessionId = await saveSession(creds, num);
 
             await sock.sendMessage(sock.user.id, {
-              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n*Your session key:*\n\`\`\`${sessionId}\`\`\`\n\n⚠️ *Keep this private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
+              text: `${sessionId}` });
+            
+            await sock.sendMessage(sock.user.id, {
+              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n* Above is Your session key:*\n\n⚠️ *Keep it  private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
             });
 
             console.log(`✅ Session saved for ${num}: ${sessionId}`);
