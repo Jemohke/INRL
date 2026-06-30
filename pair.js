@@ -59,7 +59,7 @@ router.get('/', async (req, res) => {
               text: `${sessionId}` });
             
             await sock.sendMessage(sock.user.id, {
-              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n* Above is Your session key:*\n\n⚠️ *Keep it  private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
+              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n☝️ *Above is Your session key.*\n\n⚠️ *Keep it  private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
             });
 
             console.log(`✅ Session saved for ${num}: ${sessionId}`);
