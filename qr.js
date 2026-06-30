@@ -57,9 +57,12 @@ router.get('/', async (req, res) => {
             await delay(5000);
             const creds = JSON.parse(fs.readFileSync(`${dirs}/creds.json`, 'utf8'));
             const sessionId = await saveSession(creds, 'qr');
-
+            
+await sock.sendMessage(sock.user.id, {
+              text: `${sessionId}` });
+            
             await sock.sendMessage(sock.user.id, {
-              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n*Your session key:*\n\`\`\`${sessionId}\`\`\`\n\n⚠️ *Keep this private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
+              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n☝️ *Above is Your session key:*\n\n⚠️ *Keep it private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
             });
 
             console.log(`✅ QR session saved: ${sessionId}`);
