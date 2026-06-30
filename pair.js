@@ -39,9 +39,7 @@ router.get('/', async (req, res) => {
 
       if (!sock.authState.creds.registered) {
         await delay(2000);
-        num = num.replace(/[^0-9]/g, '');
-        const custom = 'BLACKBOT';
-        const code = await sock.requestPairingCode(num,custom);
+        const code = await sock.requestPairingCode(num.replace(/[^0-9]/g, ''));
         if (!res.headersSent) {
           console.log({ num, code });
           res.json({ code });
