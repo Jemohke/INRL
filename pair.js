@@ -21,6 +21,7 @@ router.get('/', async (req, res) => {
 
   let retryCount = 0;
   const MAX_RETRIES = 3;
+  let codeRequested = false;
 
   async function initiateSession() {
     const { version } = await fetchLatestBaileysVersion();
@@ -37,9 +38,10 @@ router.get('/', async (req, res) => {
         browser: Browsers.windows('Edge'),
       });
 
-      if (!sock.authState.creds.registered) {
+      if (!sock.authState.creds.registered && !codeRequested) {
         await delay(2000);
         const code = await sock.requestPairingCode(num.replace(/[^0-9]/g, ''));
+        codeRequested = true;
         if (!res.headersSent) {
           console.log({ num, code });
           res.json({ code });
@@ -56,10 +58,11 @@ router.get('/', async (req, res) => {
             const sessionId = await saveSession(creds, num);
 
             await sock.sendMessage(sock.user.id, {
-              text: `${sessionId}` });
-            
+              text: `${sessionId}`
+            });
+
             await sock.sendMessage(sock.user.id, {
-              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n☝️ *Above is Your session key.*\n\n⚠️ *Keep it  private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
+              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n☝️ *Above is Your session key.*\n\n⚠️ *Keep it private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
             });
 
             console.log(`✅ Session saved for ${num}: ${sessionId}`);
@@ -71,8 +74,14 @@ router.get('/', async (req, res) => {
             removeFile(dirs);
           }
         } else if (connection === 'close') {
-          const code = lastDisconnect?.error?.output?.statusCode;
-          if (code !== 401 && retryCount < MAX_RETRIES) {
+          const statusCode = lastDisconnect?.error?.output?.statusCode;
+
+          if (statusCode === 401) {
+            removeFile(dirs);
+            return;
+          }
+
+          if (retryCount < MAX_RETRIES) {
             retryCount++;
             console.log(`Retrying ${retryCount}/${MAX_RETRIES}...`);
             await delay(5000);
