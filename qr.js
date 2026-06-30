@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'fs';
 import pino from 'pino';
 import QRCode from 'qrcode';
-import { makeWASocket, useMultiFileAuthState, delay, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
+import { makeWASocket, useMultiFileAuthState, delay, fetchLatestBaileysVersion, makeCacheableSignalKeyStore, Browsers } from '@whiskeysockets/baileys';
 import { saveSession } from './db.js';
 
 const router = express.Router();
@@ -17,10 +17,17 @@ router.get('/', async (req, res) => {
   const dirs = `./temp_qr_${Date.now()}`;
   removeFile(dirs);
 
+  const timeout = setTimeout(() => {
+    if (!res.headersSent) {
+      res.status(504).send('QR timeout — please refresh');
+    }
+  }, 25000);
+  
   let retryCount = 0;
   const MAX_RETRIES = 3;
 
   async function initiateSession() {
+    const { version } = await fetchLatestBaileysVersion();   
     const { state, saveCreds } = await useMultiFileAuthState(dirs);
     try {
       const logger = pino({ level: 'silent' });
@@ -29,7 +36,7 @@ router.get('/', async (req, res) => {
           creds: state.creds,
           keys: makeCacheableSignalKeyStore(state.keys, logger),
         },
-        version: [2, 3000, 1033105955],
+        version,
         printQRInTerminal: false,
         logger,
         browser: Browsers.macOS('Desktop'),
@@ -39,6 +46,7 @@ router.get('/', async (req, res) => {
 
       sock.ev.on('connection.update', async ({ connection, lastDisconnect, qr }) => {
         if (qr && !res.headersSent) {
+          clearTimeout(timeout);
           const buf = await QRCode.toBuffer(qr);
           res.setHeader('Content-Type', 'image/png');
           res.end(buf);
@@ -75,6 +83,7 @@ router.get('/', async (req, res) => {
       });
 
     } catch (err) {
+      clearTimeout(timeout);
       console.error('Error:', err.message);
       if (!res.headersSent) res.status(503).send('Service Unavailable');
       removeFile(dirs);
