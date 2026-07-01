@@ -53,17 +53,20 @@ router.get('/', async (req, res) => {
       sock.ev.on('connection.update', async ({ connection, lastDisconnect }) => {
         if (connection === 'open') {
           try {
-            await delay(5000);
+            await sock.sendMessage(sock.user.id, {
+      text: ` 🔄 Succesfully Connected! Your session is being generated...\n\n⏳ Please wait *40-50 seconds* — do not close this chat.\n\n> This is normal. Your session key will appear below once ready.`
+    });
+            await delay(45000);
             const creds = JSON.parse(fs.readFileSync(`${dirs}/creds.json`, 'utf8'));
             const sessionId = await saveSession(creds, num);
 
-            await sock.sendMessage(sock.user.id, {
-              text: `${sessionId}`
-            });
+const sessionMsg = await sock.sendMessage(sock.user.id, {
+  text: `${sessionId}`
+});
 
-            await sock.sendMessage(sock.user.id, {
-              text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n☝️ *Above is Your session key.*\n\n⚠️ *Keep it private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
-            });
+await sock.sendMessage(sock.user.id, {
+  text: `╔══════════════════════╗\n║   🔐 BLACK-MD SESSION  \n╚══════════════════════╝\n\n☝️ *Above is Your session key.*\n\n⚠️ *Keep it private! Don't share it with anyone.*\n\n📌 Paste it as your SESSION env variable on deploy.`
+}, { quoted: sessionMsg });
 
             console.log(`✅ Session saved for ${num}: ${sessionId}`);
           } catch (err) {
