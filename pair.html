@@ -87,8 +87,8 @@
             <div class="countdown" id="countdown">Code expires in <span id="timer">60</span>s</div>
             <br>
             <div class="music-button-container">
-              <button class="music-button" onclick="toggleMusic()">
-                <i class="fas fa-music"></i> Play/Pause Music
+              <button class="music-button" id="musicBtn" onclick="toggleMusic()">
+  ▶️ Play
               </button>
               <audio id="backgroundMusic" loop src="https://files.catbox.moe/bhj66x.m4a"></audio>
             </div>
@@ -175,10 +175,17 @@
       }
     });
 
-    function toggleMusic() {
-      if (isPlaying) { backgroundMusic.pause(); isPlaying = false; }
-      else { backgroundMusic.play(); isPlaying = true; }
-    }
+function toggleMusic() {
+   if (isPlaying) {
+    backgroundMusic.pause();
+    isPlaying = false;
+    musicBtn.textContent = '▶️ Play';
+  } else {
+    backgroundMusic.play();
+    isPlaying = true;
+    musicBtn.textContent = '⏸️ Pause';
+  }
+}
   </script>
 </body>
 </html>
